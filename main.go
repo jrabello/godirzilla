@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jrabello/godirzilla/command"
 	"github.com/spf13/cobra"
 )
 
@@ -20,13 +21,12 @@ func Execute() {
 }
 
 func main() {
-
 	var addCmd = &cobra.Command{
 		Use:   "add [dir]",
 		Short: "Adds a directory to the config file",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.HandleAddCommand(args)
+			command.HandleAddCommand(args)
 		},
 	}
 	rootCmd.AddCommand(addCmd)
@@ -36,7 +36,7 @@ func main() {
 		Short: "Removes a directory from the config file",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.HandleRemoveCommand(args)
+			command.HandleRemoveCommand(args)
 		},
 	}
 	rootCmd.AddCommand(remCmd)
@@ -45,7 +45,7 @@ func main() {
 		Use:   "list",
 		Short: "Lists all directories in the config file",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.HandleListCommand()
+			command.HandleListCommand()
 		},
 	}
 	rootCmd.AddCommand(listCmd)
@@ -54,7 +54,7 @@ func main() {
 		Use:   "run <command> [args...]",
 		Short: "Runs a command in all directories in the config file",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.HandleRunCommand(rootCmd, args)
+			command.HandleRunCommand(args)
 		},
 	}
 	rootCmd.AddCommand(runCmd)

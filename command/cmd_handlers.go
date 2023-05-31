@@ -1,10 +1,11 @@
-package cmd
+package command
 
 import (
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -12,14 +13,27 @@ import (
 )
 
 func HandleAddCommand(args []string) {
-	dir := args[0]
+	partialDir := args[0]
+
+	// Convert the partial directory to absolute directory
+	absDir, err := filepath.Abs(partialDir)
+	if err != nil {
+		log.Fatalf("Error converting partial directory to absolute: %v", err)
+	}
+
+	// Check if the absolute directory exists
+	_, err = os.Stat(absDir)
+	if os.IsNotExist(err) {
+		log.Fatalf("Directory %s does not exist", absDir)
+	}
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
 	// Add the directory to the configuration
-	cfg.Directories = append(cfg.Directories, dir)
+	cfg.Directories = append(cfg.Directories, absDir)
 
 	// Save the updated configuration
 	err = config.SaveConfig(cfg)
@@ -27,8 +41,7 @@ func HandleAddCommand(args []string) {
 		log.Fatalf("Error saving config: %v", err)
 	}
 
-	fmt.Printf("Added directory %s to config\n", dir)
-
+	fmt.Printf("Added directory %s to config\n", absDir)
 }
 
 func HandleRemoveCommand(args []string) {
@@ -56,11 +69,17 @@ func HandleRemoveCommand(args []string) {
 }
 
 func HandleListCommand() {
+	fmt.Println("Listing directories from config file...")
+
+	// Load the configuration
 	config, err := config.LoadConfig()
 	if err != nil {
 		fmt.Printf("Error loading config: %v\n", err)
 		return
 	}
+
+	// Print the directories
+	fmt.Printf("Found %d directories!\n", len(config.Directories))
 	for _, dir := range config.Directories {
 		fmt.Println(dir)
 	}
