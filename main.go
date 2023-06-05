@@ -21,42 +21,8 @@ func Execute() {
 }
 
 func main() {
-	var addCmd = &cobra.Command{
-		Use:   "add [dir]",
-		Short: "Adds a directory to the config file",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			command.HandleAddCommand(args)
-		},
-	}
-	rootCmd.AddCommand(addCmd)
-
-	var remCmd = &cobra.Command{
-		Use:   "rem [dir]",
-		Short: "Removes a directory from the config file",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			command.HandleRemoveCommand(args)
-		},
-	}
-	rootCmd.AddCommand(remCmd)
-
-	var listCmd = &cobra.Command{
-		Use:   "list",
-		Short: "Lists all directories in the config file",
-		Run: func(cmd *cobra.Command, args []string) {
-			command.HandleListCommand()
-		},
-	}
-	rootCmd.AddCommand(listCmd)
-
-	var runCmd = &cobra.Command{
-		Use:   "run <command> [args...]",
-		Short: "Runs a command in all directories in the config file",
-		Run: func(cmd *cobra.Command, args []string) {
-			command.HandleRunCommand(args)
-		},
-	}
-	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(command.DirCmd)
+	rootCmd.AddCommand(command.GrpCmd)
+	rootCmd.AddCommand(command.RunCmd)
 	Execute()
 }

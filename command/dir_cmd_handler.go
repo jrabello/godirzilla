@@ -1,18 +1,19 @@
 package command
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
-	"sync"
-	"sync/atomic"
 
 	"github.com/jrabello/godirzilla/config"
+	"github.com/spf13/cobra"
 )
+
+var DirCmd = &cobra.Command{
+	Use:   "dir",
+	Short: "Manage directories",
+}
 
 func HandleAddCommand(args []string) {
 	partialDir := args[0]
@@ -87,52 +88,32 @@ func HandleListCommand() {
 	}
 }
 
-func runCommand(dir, command string, id int, wg *sync.WaitGroup) {
-	defer wg.Done() // make sure this is the first line in your goroutine, so it gets called when the function exits
-
-	shell := os.Getenv("SHELL")
-	var sourceFile string
-	switch {
-	case strings.Contains(shell, "bash"):
-		sourceFile = "~/.bashrc"
-	case strings.Contains(shell, "zsh"):
-		sourceFile = "~/.zshrc"
-	default:
-		// Default to bash if the shell isn't recognized
-		sourceFile = "~/.bashrc"
-	}
-
-	var outbuf, errbuf bytes.Buffer
-	c := exec.Command(shell, "-c", fmt.Sprintf("source %s; cd %s && %s", sourceFile, dir, command))
-	c.Stdout = &outbuf
-	c.Stderr = &errbuf
-	err := c.Run()
-
-	log.Printf("[Thread %d] Running command '%s' in directory: %s\n", id, command, dir)
-	if err != nil {
-		log.Printf("[Thread %d] Failed to run command in directory %s: %v\n", id, dir, err)
-	}
-	if outbuf.Len() > 0 {
-		log.Printf("[Thread %d] Output:\n%s\n", id, outbuf.String())
-	}
-	if errbuf.Len() > 0 {
-		log.Printf("[Thread %d] Errors:\n%s\n", id, errbuf.String())
-	}
+var dirAddCmd = &cobra.Command{
+	Use:   "add [dir]",
+	Short: "Adds a directory to the config file",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		HandleAddCommand(args)
+	},
 }
 
-func HandleRunCommand(args []string) {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
-	}
+var dirListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "Lists all directories in the config file",
+	Run: func(cmd *cobra.Command, args []string) {
+		HandleListCommand()
+	},
+}
 
-	command := strings.Join(args, " ")
+var dirRemCmd = &cobra.Command{
+	Use:   "rem [dir]",
+	Short: "Removes a directory from the config file",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		HandleRemoveCommand(args)
+	},
+}
 
-	var wg sync.WaitGroup
-	goroutineID := new(int32)
-	for _, dir := range cfg.Directories {
-		wg.Add(1)
-		go runCommand(dir, command, int(atomic.AddInt32(goroutineID, 1)-1), &wg) // pass the wait group to your function
-	}
-	wg.Wait() // wait for all goroutines to finish
+func init() {
+	DirCmd.AddCommand(dirAddCmd, dirListCmd, dirRemCmd)
 }
