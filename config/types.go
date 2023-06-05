@@ -60,6 +60,33 @@ func (c *Config) SetCurrentGroup(groupName Group) error {
 	return nil
 }
 
+func (c *Config) isGroupExists(group Group) bool {
+	if _, exists := c.Groups[group]; !exists {
+		return false
+	} else {
+		return true
+	}
+}
+
+func (c *Config) AddDirectoryToGroup(group Group, dir Directory) error {
+	grp := c.Groups[group]
+
+	if !c.isGroupExists(group) {
+		grp = append(grp, dir)
+	}
+
+	err := SaveConfig(c)
+	if err != nil {
+		return fmt.Errorf("error saving config: %v", err)
+	}
+
+	return nil
+}
+
 func ToGroup(value string) Group {
 	return Group(value)
+}
+
+func ToDirectory(value string) Directory {
+	return Directory(value)
 }
