@@ -9,9 +9,10 @@ import (
 	"sync/atomic"
 
 	"github.com/fatih/color"
+	"github.com/jrabello/godirzilla/config"
 )
 
-func runCommand(dir, command string, id int, wg *sync.WaitGroup) {
+func runCommand(dir config.Directory, command string, id int, wg *sync.WaitGroup) {
 	log.SetFlags(0)
 	defer wg.Done()
 
@@ -36,7 +37,7 @@ func runCommand(dir, command string, id int, wg *sync.WaitGroup) {
 }
 
 // Run all commands in their respective target directories
-func CreateThreadsAndRunAllCommands(command string, directories []string) {
+func CreateThreadsAndRunAllCommands(command string, directories []config.Directory) {
 	var wg sync.WaitGroup
 	goroutineID := new(int32)
 	for _, dir := range directories {

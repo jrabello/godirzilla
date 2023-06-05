@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 )
-
-type Config struct {
-	Directories []string `json:"directories"`
-}
 
 func configFilePath() (string, error) {
 	homeDir, err := os.UserHomeDir()
@@ -21,33 +18,26 @@ func configFilePath() (string, error) {
 	return filepath.Join(homeDir, ".godirzilla", "config.json"), nil
 }
 
-func LoadConfig() (Config, error) {
-	var config Config
+func LoadConfig() (*Config, error) {
+	var cfg Config
 
-	filePath, err := configFilePath()
+	homeDir, _ := os.UserHomeDir()
+	configFilePath := path.Join(homeDir, ".godirzilla", "config.json")
+
+	data, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		return config, err
+		return nil, fmt.Errorf("Error reading config file: %w", err)
 	}
 
-	data, err := ioutil.ReadFile(filePath)
+	err = json.Unmarshal(data, &cfg)
 	if err != nil {
-		// If the file doesn't exist, that's okay; we'll create it when we save the config
-		if os.IsNotExist(err) {
-			return config, nil
-		}
-
-		return config, fmt.Errorf("unable to read config file: %w", err)
+		return nil, fmt.Errorf("Error unmarshaling config file: %w", err)
 	}
 
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		return config, fmt.Errorf("unable to parse config file: %w", err)
-	}
-
-	return config, nil
+	return &cfg, nil
 }
 
-func SaveConfig(config Config) error {
+func SaveConfig(config *Config) error {
 	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return fmt.Errorf("unable to encode config: %w", err)

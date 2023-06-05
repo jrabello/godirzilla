@@ -22,7 +22,11 @@ func HandleRunCommand(args []string) {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
+	if cfg.CurrentGroup == "" {
+		log.Fatal("No current group is set in config, please set a current group before running a command!")
+	}
+
 	command := strings.Join(args, " ")
 
-	CreateThreadsAndRunAllCommands(command, cfg.Directories)
+	CreateThreadsAndRunAllCommands(command, cfg.GetDirectoriesFromGroup(cfg.CurrentGroup))
 }
