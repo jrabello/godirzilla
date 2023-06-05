@@ -80,6 +80,10 @@ var grpListCmd = &cobra.Command{
 			log.Fatalf("Error loading config: %v", err)
 		}
 
+		if len(cfg.Groups) == 0 {
+			fmt.Println("No group found!")
+		}
+
 		for groupName := range cfg.Groups {
 			fmt.Println(groupName)
 		}
