@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/jrabello/godirzilla/command"
+	"github.com/jrabello/godirzilla/config"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +22,7 @@ func Execute() {
 }
 
 func main() {
+	config.Upsert()
 	rootCmd.AddCommand(command.DirCmd)
 	rootCmd.AddCommand(command.GrpCmd)
 	rootCmd.AddCommand(command.RunCmd)

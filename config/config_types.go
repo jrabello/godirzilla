@@ -1,6 +1,8 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Group string
 
@@ -11,8 +13,11 @@ type Config struct {
 	Groups       map[Group][]Directory
 }
 
-func (c *Config) GetDirectoriesFromGroup(group Group) []Directory {
-	return c.Groups[group]
+func (c *Config) GetDirectoriesFromGroup(group Group) ([]Directory, error) {
+	if dirs, ok := c.Groups[group]; ok {
+		return dirs, nil
+	}
+	return nil, fmt.Errorf("group %s does not exist", group)
 }
 
 func (c *Config) AddGroup(groupName Group) error {
@@ -21,12 +26,6 @@ func (c *Config) AddGroup(groupName Group) error {
 	}
 
 	c.Groups[groupName] = []Directory{}
-
-	err := SaveConfig(c)
-	if err != nil {
-		return fmt.Errorf("Error saving config: %v", err)
-	}
-
 	return nil
 }
 
@@ -35,13 +34,7 @@ func (c *Config) RemoveGroup(groupName Group) error {
 		return fmt.Errorf("group %s does not exist", groupName)
 	}
 
-	delete(c.Groups, groupName) // Remove the group
-
-	err := SaveConfig(c)
-	if err != nil {
-		return fmt.Errorf("error saving config: %v", err)
-	}
-
+	delete(c.Groups, groupName)
 	return nil
 }
 
@@ -50,31 +43,20 @@ func (c *Config) SetCurrentGroup(groupName Group) error {
 		return fmt.Errorf("group %s does not exist", groupName)
 	}
 
-	c.CurrentGroup = groupName // Set the group
-
-	err := SaveConfig(c)
-	if err != nil {
-		return fmt.Errorf("error saving config: %v", err)
-	}
-
+	c.CurrentGroup = groupName
 	return nil
 }
 
-func (c *Config) isGroupExists(group Group) bool {
+func (c *Config) AddDirectoryToGroup(group Group, dir Directory) error {
 	if _, exists := c.Groups[group]; !exists {
-		return false
-	} else {
-		return true
+		return fmt.Errorf("group %s does not exist", group)
 	}
+
+	c.Groups[group] = append(c.Groups[group], dir)
+	return nil
 }
 
-func (c *Config) AddDirectoryToGroup(group Group, dir Directory) error {
-	grp := c.Groups[group]
-
-	if !c.isGroupExists(group) {
-		grp = append(grp, dir)
-	}
-
+func (c *Config) ApplyChanges() error {
 	err := SaveConfig(c)
 	if err != nil {
 		return fmt.Errorf("error saving config: %v", err)

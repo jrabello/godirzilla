@@ -15,47 +15,6 @@ var DirCmd = &cobra.Command{
 	Short: "Manage directories",
 }
 
-// func HandleRemoveCommand(args []string) {
-// 	dir := args[0]
-// 	cfg, err := config.LoadConfig()
-// 	if err != nil {
-// 		log.Fatalf("Error loading config: %v", err)
-// 	}
-
-// 	// Find and remove the directory from the configuration
-// 	for i, d := range cfg.Directories {
-// 		if d == dir {
-// 			cfg.Directories = append(cfg.Directories[:i], cfg.Directories[i+1:]...)
-// 			break
-// 		}
-// 	}
-
-// 	// Save the updated configuration
-// 	err = config.SaveConfig(cfg)
-// 	if err != nil {
-// 		log.Fatalf("Error saving config: %v", err)
-// 	}
-
-// 	fmt.Printf("Removed directory %s from config\n", dir)
-// }
-
-// func HandleListCommand() {
-// 	fmt.Println("Listing directories from config file...")
-
-// 	// Load the configuration
-// 	config, err := config.LoadConfig()
-// 	if err != nil {
-// 		fmt.Printf("Error loading config: %v\n", err)
-// 		return
-// 	}
-
-// 	// Print the directories
-// 	fmt.Printf("Found %d directories!\n", len(config.Directories))
-// 	for _, dir := range config.Directories {
-// 		fmt.Println(dir)
-// 	}
-// }
-
 var dirAddCmd = &cobra.Command{
 	Use:   "add [dir]",
 	Short: "Adds a directory to the current group",
@@ -89,6 +48,11 @@ var dirAddCmd = &cobra.Command{
 		err = cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
 		if err != nil {
 			log.Fatalf("Error adding directory to group: %v", err)
+		}
+
+		err = cfg.ApplyChanges()
+		if err != nil {
+			log.Fatalf("Error trying to save config file: %v", err)
 		}
 
 		fmt.Printf("Added directory %s to current group\n", absDir)

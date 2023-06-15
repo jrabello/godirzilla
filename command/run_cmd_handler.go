@@ -27,6 +27,10 @@ func HandleRunCommand(args []string) {
 	}
 
 	command := strings.Join(args, " ")
+	directoryList, err := cfg.GetDirectoriesFromGroup(cfg.CurrentGroup)
+	if err != nil {
+		log.Fatalf("No DirectoryList was found for group: %s", cfg.CurrentGroup)
+	}
 
-	CreateThreadsAndRunAllCommands(command, cfg.GetDirectoriesFromGroup(cfg.CurrentGroup))
+	CreateThreadsAndRunAllCommands(command, directoryList)
 }
