@@ -26,13 +26,22 @@ func runCommand(dir config.Directory, command string, id int, wg *sync.WaitGroup
 
 	log.Printf("[thread-%d] Running command '%s' in directory: %s\n", id, command, dir)
 	if err != nil {
-		errorColor("[thread-%d] Failed to run command in directory %s: %v\n", id, dir, err)
+		if exitError, ok := err.(*exec.ExitError); ok {
+			// The process returned a non-zero exit code
+			exitCode := exitError.ExitCode()
+			errorColor("[thread-%d] Failed to run command in directory %s. Exit code: %d\n", id, dir, exitCode)
+		} else {
+			// The command execution encountered an error
+			errorColor("[thread-%d] Failed to run command in directory %s. Error: %v\n", id, dir, err)
+		}
 	}
+
 	if outbuf.Len() > 0 {
-		log.Printf("[thread-%d] Output:\n%s\n", id, outbuf.String())
+		log.Printf("[thread-%d] stdout:\n%s\n", id, outbuf.String())
 	}
+
 	if errbuf.Len() > 0 {
-		errorColor("[thread-%d] Errors:\n%s\n", id, errbuf.String())
+		log.Printf("[thread-%d] stderr:\n%s\n", id, errbuf.String())
 	}
 }
 
