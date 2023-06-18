@@ -3,10 +3,9 @@ package command
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 
 	"github.com/jrabello/godirzilla/config"
+	"github.com/jrabello/godirzilla/file"
 	"github.com/spf13/cobra"
 )
 
@@ -16,24 +15,10 @@ var DirCmd = &cobra.Command{
 }
 
 var dirAddCmd = &cobra.Command{
-	Use:   "add [dir]",
+	Use:   "add [dirName]",
 	Short: "Adds a directory to the current group",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		partialDir := args[0]
-
-		// Convert the partial directory to absolute directory
-		absDir, err := filepath.Abs(partialDir)
-		if err != nil {
-			log.Fatalf("Error converting partial directory to absolute: %v", err)
-		}
-
-		// Check if the absolute directory exists
-		_, err = os.Stat(absDir)
-		if os.IsNotExist(err) {
-			log.Fatalf("Directory %s does not exist", absDir)
-		}
-
 		cfg, err := config.LoadConfig()
 		if err != nil {
 			log.Fatalf("Error loading config: %v", err)
@@ -45,6 +30,7 @@ var dirAddCmd = &cobra.Command{
 		}
 
 		// Add the directory to the current group
+		absDir := file.GetAbsoluteFilePath(args[0])
 		err = cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
 		if err != nil {
 			log.Fatalf("Error adding directory to group: %v", err)
@@ -54,32 +40,42 @@ var dirAddCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Error trying to save config file: %v", err)
 		}
-
-		fmt.Printf("Added directory %s to current group\n", absDir)
+		fmt.Printf("Added directory %s to current group: %s\n", absDir, cfg.CurrentGroup)
 	},
 }
 
-// var dirListCmd = &cobra.Command{
-// 	Use:   "list",
-// 	Short: "Lists all directories in the config file",
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		HandleListCommand()
-// 	},
-// }
+var dirListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "Lists all directories in the config file",
+	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := config.LoadConfig()
+		if err != nil {
+			log.Fatalf("Error loading config: %v", err)
+		}
+		cfg.PrintDirectoriesFromCurrentGroup()
+	},
+}
 
-// var dirRemCmd = &cobra.Command{
-// 	Use:   "rem [dir]",
-// 	Short: "Removes a directory from the config file",
-// 	Args:  cobra.ExactArgs(1),
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		HandleRemoveCommand(args)
-// 	},
-// }
+var dirRemCmd = &cobra.Command{
+	Use:   "rem [dirName]",
+	Short: "Removes a directory from the config file",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := config.LoadConfig()
+		if err != nil {
+			log.Fatalf("Error loading config: %v", err)
+		}
+		directoryName := config.ToDirectory(args[0])
+		cfg.RemoveDirectoryFromCurrentGroup(directoryName)
+		cfg.ApplyChanges()
+		fmt.Printf("Removed directory `%s` from current group: `%s`\n", directoryName, cfg.CurrentGroup)
+	},
+}
 
 func init() {
 	DirCmd.AddCommand(
 		dirAddCmd,
-		// dirListCmd,
-		// dirRemCmd
+		dirListCmd,
+		dirRemCmd,
 	)
 }

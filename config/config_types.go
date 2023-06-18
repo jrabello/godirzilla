@@ -48,11 +48,55 @@ func (c *Config) SetCurrentGroup(groupName Group) error {
 }
 
 func (c *Config) AddDirectoryToGroup(group Group, dir Directory) error {
-	if _, exists := c.Groups[group]; !exists {
+	groupDirs, exists := c.Groups[group]
+	if !exists {
 		return fmt.Errorf("group %s does not exist", group)
 	}
 
-	c.Groups[group] = append(c.Groups[group], dir)
+	for _, existingDir := range groupDirs {
+		if existingDir == dir {
+			return fmt.Errorf("directory `%s` already exists in group `%s`", dir, group)
+		}
+	}
+
+	c.Groups[group] = append(groupDirs, dir)
+	return nil
+}
+
+func (c *Config) PrintDirectoriesFromCurrentGroup() {
+	currentGroup, exists := c.Groups[c.CurrentGroup]
+	if !exists {
+		fmt.Printf("Group %s does not exist\n", c.CurrentGroup)
+		return
+	}
+
+	fmt.Printf("Directories from group %s:\n", c.CurrentGroup)
+	for _, dir := range currentGroup {
+		fmt.Println(dir)
+	}
+}
+
+func (c *Config) RemoveDirectoryFromCurrentGroup(dir Directory) error {
+	groupDirs, exists := c.Groups[c.CurrentGroup]
+	if !exists {
+		return fmt.Errorf("group %s does not exist", c.CurrentGroup)
+	}
+
+	// Check if the directory exists in the group
+	index := -1
+	for i, existingDir := range groupDirs {
+		if existingDir == dir {
+			index = i
+			break
+		}
+	}
+
+	if index == -1 {
+		return fmt.Errorf("directory %s does not exist in group %s", dir, c.CurrentGroup)
+	}
+
+	// Remove the directory from the group
+	c.Groups[c.CurrentGroup] = append(groupDirs[:index], groupDirs[index+1:]...)
 	return nil
 }
 
