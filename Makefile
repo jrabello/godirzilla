@@ -1,10 +1,10 @@
 PROJECT_NAME := $(shell basename $(CURDIR))
 
 build:
-	go build -o bin/$(PROJECT_NAME)
+	go build -o bin/gdz
 
 run: build
-	./bin/$(PROJECT_NAME)
+	./bin/gdz
 
 clean:
-	rm -f ./bin/$(PROJECT_NAME)
+	rm -f ./bin/gdz
