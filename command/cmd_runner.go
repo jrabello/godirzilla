@@ -17,6 +17,7 @@ func runCommand(dir config.Directory, command string, id int, wg *sync.WaitGroup
 	defer wg.Done()
 
 	errorColor := color.New(color.FgRed).PrintfFunc()
+	infoColor := color.New(color.FgWhite).PrintfFunc()
 
 	var outbuf, errbuf bytes.Buffer
 	c := exec.Command("sh", "-c", fmt.Sprintf("cd %s && %s", dir, command))
@@ -37,15 +38,15 @@ func runCommand(dir config.Directory, command string, id int, wg *sync.WaitGroup
 	}
 
 	if outbuf.Len() > 0 {
-		log.Printf("[thread-%d] stdout:\n%s\n", id, outbuf.String())
+		infoColor("[thread-%d] stdout:\n%s\n", id, outbuf.String())
 	}
 
 	if errbuf.Len() > 0 {
-		log.Printf("[thread-%d] stderr:\n%s\n", id, errbuf.String())
+		errorColor("[thread-%d] stderr:\n%s\n", id, errbuf.String())
 	}
 }
 
-// Run all commands in their respective target directories
+// CreateThreadsAndRunAllCommands runs all commands in their respective target directories in separate threads
 func CreateThreadsAndRunAllCommands(command string, directories []config.Directory) {
 	var wg sync.WaitGroup
 	goroutineID := new(int32)
@@ -53,6 +54,5 @@ func CreateThreadsAndRunAllCommands(command string, directories []config.Directo
 		wg.Add(1)
 		go runCommand(dir, command, int(atomic.AddInt32(goroutineID, 1)-1), &wg)
 	}
-	// wait for all goroutines to finish
 	wg.Wait()
 }
