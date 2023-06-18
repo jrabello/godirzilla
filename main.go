@@ -22,7 +22,7 @@ func Execute() {
 }
 
 func main() {
-	config.Upsert()
+	config.CreateConfigFileIfNotExists()
 	rootCmd.AddCommand(command.DirCmd)
 	rootCmd.AddCommand(command.GrpCmd)
 	rootCmd.AddCommand(command.RunCmd)

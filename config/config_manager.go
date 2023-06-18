@@ -10,13 +10,18 @@ import (
 
 type FilePath string
 
-func getConfigFilePath() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("unable to get user home directory: %w", err)
+func CreateConfigFileIfNotExists() {
+	if isConfigFileExists() {
+		return
 	}
 
-	return filepath.Join(homeDir, ".godirzilla", "config.json"), nil
+	cfg := Config{
+		CurrentGroup: "main",
+		Groups:       make(map[Group][]Directory),
+	}
+	cfg.Groups["main"] = []Directory{}
+
+	SaveConfig(&cfg)
 }
 
 func UpsertNewConfigDirectory() error {
@@ -32,20 +37,6 @@ func UpsertNewConfigDirectory() error {
 	}
 
 	return nil
-}
-
-func UpsertNewConfigFile() {
-	if isConfigFileExists() {
-		return
-	}
-
-	cfg := Config{
-		CurrentGroup: "main",
-		Groups:       make(map[Group][]Directory),
-	}
-	cfg.Groups["main"] = []Directory{}
-
-	SaveConfig(&cfg)
 }
 
 func isConfigFileExists() bool {
@@ -109,4 +100,13 @@ func SaveConfig(config *Config) error {
 	}
 
 	return nil
+}
+
+func getConfigFilePath() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("unable to get user home directory: %w", err)
+	}
+
+	return filepath.Join(homeDir, ".godirzilla", "config.json"), nil
 }

@@ -14,34 +14,30 @@ var GrpCmd = &cobra.Command{
 }
 
 var grpAddCmd = &cobra.Command{
-	Use:   "add",
+	Use:   "add [groupName]",
 	Short: "Add a new group",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 1 {
-			log.Fatalf("You must provide a group name to add")
-		}
-
 		cfg, err := config.LoadConfig()
 		if err != nil {
 			log.Fatalf("Error loading config: %v", err)
 		}
 
 		groupName := config.ToGroup(args[0])
-
 		if err := cfg.AddGroup(groupName); err != nil {
 			log.Fatalf("Failed to add group: %v", err)
 		}
+
+		cfg.ApplyChanges()
+		fmt.Printf("group: `%s` created successfully!\n", groupName)
 	},
 }
 
 var grpRemCmd = &cobra.Command{
-	Use:   "rem",
+	Use:   "rem [groupName]",
 	Short: "Remove a group",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 1 {
-			log.Fatalf("You must provide a group name to remove")
-		}
-
 		cfg, err := config.LoadConfig()
 		if err != nil {
 			log.Fatalf("Error loading config: %v", err)
@@ -49,13 +45,15 @@ var grpRemCmd = &cobra.Command{
 
 		groupName := config.ToGroup(args[0])
 		cfg.RemoveGroup(groupName)
+		cfg.ApplyChanges()
+		fmt.Printf("group: `%s` removed successfully!\n", groupName)
 	},
 }
 
 var grpSetCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Set a current group",
-	Args:  cobra.ExactArgs(1), // Requires exactly one argument
+	Use:   "set [groupName]",
+	Short: "Set a current group to work with",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := config.LoadConfig()
 		if err != nil {
@@ -63,11 +61,12 @@ var grpSetCmd = &cobra.Command{
 		}
 
 		groupName := config.Group(args[0])
-
 		err = cfg.SetCurrentGroup(groupName)
 		if err != nil {
 			log.Fatalf("Error setting current group: %v", err)
 		}
+		cfg.ApplyChanges()
+		fmt.Printf("group: `%s` set as current successfully!\n", groupName)
 	},
 }
 
@@ -84,8 +83,13 @@ var grpListCmd = &cobra.Command{
 			fmt.Println("No group found!")
 		}
 
+		fmt.Println("groups:")
 		for groupName := range cfg.Groups {
-			fmt.Println(groupName)
+			if groupName == cfg.CurrentGroup {
+				fmt.Printf("* %s (current)\n", groupName)
+			} else {
+				fmt.Println(groupName)
+			}
 		}
 	},
 }
