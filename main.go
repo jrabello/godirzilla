@@ -10,7 +10,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "godirzilla",
+	Use:   "gdz",
 	Short: "GoDirZilla is a cool and fast CLI tool to execute the same command in groups of directories at the same time in separate threads",
 }
 

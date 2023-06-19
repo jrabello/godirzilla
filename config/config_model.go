@@ -5,7 +5,7 @@ import (
 )
 
 type Group string
-
+type FilePath string
 type Directory string
 
 type Config struct {
@@ -64,14 +64,19 @@ func (c *Config) AddDirectoryToGroup(group Group, dir Directory) error {
 }
 
 func (c *Config) PrintDirectoriesFromCurrentGroup() {
-	currentGroup, exists := c.Groups[c.CurrentGroup]
+	currentGroupDirectoryList, exists := c.Groups[c.CurrentGroup]
 	if !exists {
 		fmt.Printf("Group %s does not exist\n", c.CurrentGroup)
 		return
 	}
 
-	fmt.Printf("Directories from group %s:\n", c.CurrentGroup)
-	for _, dir := range currentGroup {
+	if len(currentGroupDirectoryList) == 0 {
+		fmt.Printf("Your current group `%s` have no directories into it!\n", c.CurrentGroup)
+		return
+	}
+
+	fmt.Printf("Directories from current group `%s`:\n", c.CurrentGroup)
+	for _, dir := range currentGroupDirectoryList {
 		fmt.Println(dir)
 	}
 }

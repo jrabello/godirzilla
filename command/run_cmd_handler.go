@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -28,6 +29,7 @@ var RunCmd = &cobra.Command{
 			log.Fatalf("No DirectoryList was found for group: %s", cfg.CurrentGroup)
 		}
 
+		fmt.Printf("Running command: `%s` inside directories of group: `%s`\n", command, cfg.CurrentGroup)
 		CreateThreadsAndRunAllCommands(command, directoryList)
 	},
 }

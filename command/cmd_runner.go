@@ -19,13 +19,13 @@ func runCommand(dir config.Directory, command string, id int, wg *sync.WaitGroup
 	errorColor := color.New(color.FgRed).PrintfFunc()
 	infoColor := color.New(color.FgWhite).PrintfFunc()
 
-	var outbuf, errbuf bytes.Buffer
+	log.Printf("[thread-%d] Running command: '%s' in directory: '%s'\n", id, command, dir)
 	c := exec.Command("sh", "-c", fmt.Sprintf("cd %s && %s", dir, command))
+	var outbuf, errbuf bytes.Buffer
 	c.Stdout = &outbuf
 	c.Stderr = &errbuf
 	err := c.Run()
 
-	log.Printf("[thread-%d] Running command '%s' in directory: %s\n", id, command, dir)
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			// The process returned a non-zero exit code
@@ -46,7 +46,7 @@ func runCommand(dir config.Directory, command string, id int, wg *sync.WaitGroup
 	}
 }
 
-// CreateThreadsAndRunAllCommands runs all commands in their respective target directories in separate threads
+// CreateThreadsAndRunAllCommands runs all commands in their respective group and target directories in separate threads
 func CreateThreadsAndRunAllCommands(command string, directories []config.Directory) {
 	var wg sync.WaitGroup
 	goroutineID := new(int32)

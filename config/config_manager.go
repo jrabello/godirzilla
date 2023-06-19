@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
-)
 
-type FilePath string
+	"github.com/jrabello/godirzilla/file"
+)
 
 func CreateConfigFileIfNotExists() {
 	if isConfigFileExists() {
@@ -25,13 +26,10 @@ func CreateConfigFileIfNotExists() {
 }
 
 func UpsertNewConfigDirectory() error {
-	filePath, err := getConfigFilePath()
-	if err != nil {
-		return err
-	}
+	filePath := getConfigFilePath()
 
 	// Create the directory if it doesn't exist
-	err = os.MkdirAll(filepath.Dir(filePath), 0755)
+	err := os.MkdirAll(filepath.Dir(filePath), 0755)
 	if err != nil {
 		return fmt.Errorf("unable to create config directory: %w", err)
 	}
@@ -39,37 +37,14 @@ func UpsertNewConfigDirectory() error {
 	return nil
 }
 
-func isConfigFileExists() bool {
-	configFilePath, err := getConfigFilePath()
-	if err != nil {
-		return false
-	}
-
-	_, err = os.Stat(configFilePath)
-	if err == nil {
-		return true
-	}
-
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return false
-}
-
 func LoadConfig() (*Config, error) {
-	var cfg Config
-
-	configFilePath, err := getConfigFilePath()
-	if err != nil {
-		return nil, err
-	}
-
+	configFilePath := getConfigFilePath()
 	data, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading config file: %w", err)
 	}
 
+	var cfg Config
 	err = json.Unmarshal(data, &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Error unmarshaling config file: %w", err)
@@ -84,11 +59,7 @@ func SaveConfig(config *Config) error {
 		return fmt.Errorf("unable to encode config: %w", err)
 	}
 
-	configFilePath, err := getConfigFilePath()
-	if err != nil {
-		return err
-	}
-
+	configFilePath := getConfigFilePath()
 	err = UpsertNewConfigDirectory()
 	if err != nil {
 		return fmt.Errorf("unable to create file: %w", err)
@@ -102,11 +73,16 @@ func SaveConfig(config *Config) error {
 	return nil
 }
 
-func getConfigFilePath() (string, error) {
+func isConfigFileExists() bool {
+	configFilePath := getConfigFilePath()
+	return file.IsFileExists(configFilePath)
+}
+
+func getConfigFilePath() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", fmt.Errorf("unable to get user home directory: %w", err)
+		log.Fatalf("Unable to get user home directory: %w", err)
 	}
 
-	return filepath.Join(homeDir, ".godirzilla", "config.json"), nil
+	return filepath.Join(homeDir, ".cognuscraft", "godirzilla", "config.json")
 }

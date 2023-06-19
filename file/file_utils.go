@@ -20,3 +20,12 @@ func GetAbsoluteFilePath(partialDir string) string {
 	}
 	return absDir
 }
+
+func IsFileExists(filePath string) bool {
+	_, err := os.Stat(filePath)
+	if err == nil {
+		return true
+	}
+
+	return os.IsExist(err)
+}
