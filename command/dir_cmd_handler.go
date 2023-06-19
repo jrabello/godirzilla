@@ -40,7 +40,7 @@ var dirAddCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Error trying to save config file: %v", err)
 		}
-		fmt.Printf("Added directory %s to current group: %s\n", absDir, cfg.CurrentGroup)
+		fmt.Printf("Added directory `%s` to current group: `%s`\n", absDir, cfg.CurrentGroup)
 	},
 }
 

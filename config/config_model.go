@@ -63,22 +63,26 @@ func (c *Config) AddDirectoryToGroup(group Group, dir Directory) error {
 	return nil
 }
 
-func (c *Config) PrintDirectoriesFromCurrentGroup() {
-	currentGroupDirectoryList, exists := c.Groups[c.CurrentGroup]
+func (c *Config) PrintDirectoriesFromGroup(group Group) {
+	currentGroupDirectoryList, exists := c.Groups[group]
 	if !exists {
-		fmt.Printf("Group %s does not exist\n", c.CurrentGroup)
+		fmt.Printf("Group %s does not exist\n", group)
 		return
 	}
 
 	if len(currentGroupDirectoryList) == 0 {
-		fmt.Printf("Your current group `%s` have no directories into it!\n", c.CurrentGroup)
+		fmt.Printf("Your group `%s` have no directories into it!\n", group)
 		return
 	}
 
-	fmt.Printf("Directories from current group `%s`:\n", c.CurrentGroup)
+	fmt.Printf("Directories from group `%s`:\n", group)
 	for _, dir := range currentGroupDirectoryList {
 		fmt.Println(dir)
 	}
+}
+
+func (c *Config) PrintDirectoriesFromCurrentGroup() {
+	c.PrintDirectoriesFromGroup(c.CurrentGroup)
 }
 
 func (c *Config) RemoveDirectoryFromCurrentGroup(dir Directory) error {

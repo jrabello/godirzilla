@@ -29,6 +29,12 @@ var RunCmd = &cobra.Command{
 			log.Fatalf("No DirectoryList was found for group: %s", cfg.CurrentGroup)
 		}
 
+		if len(directoryList) == 0 {
+			fmt.Printf("I can not run the command: `%s` inside group: `%s` because it has no directories, please add at least one directory in order to run commands into it!\n",
+				command, cfg.CurrentGroup)
+			return
+		}
+
 		fmt.Printf("Running command: `%s` inside directories of group: `%s`\n", command, cfg.CurrentGroup)
 		CreateThreadsAndRunAllCommands(command, directoryList)
 	},

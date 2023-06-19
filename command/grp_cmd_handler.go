@@ -25,7 +25,7 @@ var grpAddCmd = &cobra.Command{
 
 		groupName := config.ToGroup(args[0])
 		if err := cfg.AddGroup(groupName); err != nil {
-			log.Fatalf("Failed to add group: %v", err)
+			log.Fatalf("Failed to add: %v", err)
 		}
 
 		cfg.ApplyChanges()
@@ -47,6 +47,18 @@ var grpRemCmd = &cobra.Command{
 		cfg.RemoveGroup(groupName)
 		cfg.ApplyChanges()
 		fmt.Printf("group: `%s` removed successfully!\n", groupName)
+	},
+}
+
+var grpCurrentCmd = &cobra.Command{
+	Use:   "curr",
+	Short: "Prints current group name",
+	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := config.LoadConfig()
+		if err != nil {
+			log.Fatalf("Error loading config: %v", err)
+		}
+		fmt.Printf("Current group: `%s`\n", cfg.CurrentGroup)
 	},
 }
 
@@ -72,7 +84,7 @@ var grpSetCmd = &cobra.Command{
 
 var grpListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List all groups",
+	Short: "List all groups and its directories",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := config.LoadConfig()
 		if err != nil {
@@ -83,17 +95,26 @@ var grpListCmd = &cobra.Command{
 			fmt.Println("No group found!")
 		}
 
-		fmt.Println("groups:")
+		fmt.Println("All Groups:")
 		for groupName := range cfg.Groups {
 			if groupName == cfg.CurrentGroup {
 				fmt.Printf("* %s (current)\n", groupName)
 			} else {
 				fmt.Println(groupName)
 			}
+
+			dirList, err := cfg.GetDirectoriesFromGroup(groupName)
+			if err != nil {
+				log.Fatalf("Error on trying to get directories from group: `%s` [%v]", groupName, err)
+			}
+
+			for _, dirName := range dirList {
+				fmt.Printf("\t- %s\n", dirName)
+			}
 		}
 	},
 }
 
 func init() {
-	GrpCmd.AddCommand(grpAddCmd, grpListCmd, grpRemCmd, grpSetCmd)
+	GrpCmd.AddCommand(grpAddCmd, grpListCmd, grpRemCmd, grpSetCmd, grpCurrentCmd)
 }
