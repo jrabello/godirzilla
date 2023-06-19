@@ -81,7 +81,7 @@ func isConfigFileExists() bool {
 func getConfigFilePath() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("Unable to get user home directory: %w", err)
+		log.Fatalf("Unable to get user home directory: %v", err)
 	}
 
 	return filepath.Join(homeDir, ".cognuscraft", "godirzilla", "config.json")
