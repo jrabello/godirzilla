@@ -35,7 +35,6 @@ var RunCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("Running command: `%s` inside directories of group: `%s`\n", command, cfg.CurrentGroup)
-		CreateThreadsAndRunAllCommands(command, directoryList)
+		CreateThreadsAndRunAllCommands(command, cfg.CurrentGroup, directoryList)
 	},
 }
