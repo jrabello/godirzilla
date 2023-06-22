@@ -38,39 +38,40 @@ func runCommand(dirPath config.Directory, command string, threadId int, wg *sync
 
 	var exitCode int = 0
 	unknownError := false
+	errorDescription := ""
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			// The process returned a non-zero exit code
 			exitCode = exitError.ExitCode()
-			fmt.Printf("error:\nfailed to run command in directory %s. Exit code: %d\n\n", dirPath, exitCode)
+			errorDescription = fmt.Sprintf("error:\nfailed to run command in directory %s. Exit code: %d\n\n", dirPath, exitCode)
 		} else {
 			// The command execution encountered an error
 			unknownError = true
-			fmt.Printf("error:\nfailed to run command in directory %s. Error: %v %d\n\n", dirPath, err, unknownError)
+			errorDescription = fmt.Sprintf("error:\nfailed to run command in directory %s. Error: %v %t\n\n", dirPath, err, unknownError)
 		}
 	}
 
 	if exitCode == 0 {
-		fmt.Printf("📂 %s%s\n\n", PadRight(dirBase, ".", 25), green("✔️"))
+		fmt.Printf("📂 %s%s\n", PadRight(dirBase, ".", 25), green("✔️"))
 	} else {
 		fmt.Printf("📂 %s%s (Exit %d)\n\n", PadRight(dirBase, ".", 25), red("❌"), exitCode)
 	}
 
 	if stdoutbuf.Len() > 0 {
-		// fmt.Printf("📂 %s:\n%s\n", dirBase, stdoutbuf.String())
 		fmt.Printf("%s\n", stdoutbuf.String())
 	}
 	if stderrbuf.Len() > 0 {
 		fmt.Printf("%s\n", stderrbuf.String())
-		// fmt.Printf("📂 %s%s\n", PadRight(dirBase, ".", 25), red("❌"))
-		// fmt.Printf("stderr:\n%s\n", stderrbuf.String())
+	}
+	if len(errorDescription) > 0 {
+		fmt.Println(errorDescription)
 	}
 }
 
 // CreateThreadsAndRunAllCommands runs all commands in their respective group and target directories in separate threads
 func CreateThreadsAndRunAllCommands(command string, currentGroup config.Group, directories []config.Directory) {
 	red := color.New(color.FgRed).SprintFunc()
-	fmt.Printf("🚀 Running command: '%s' in group: '%s'...\n\n", red(command), red(currentGroup))
+	fmt.Printf("🚀 Running command: '%s' in group: '%s'\n\n", red(command), red(currentGroup))
 
 	var wg sync.WaitGroup
 	goroutineID := new(int32)
