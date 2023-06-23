@@ -3,10 +3,12 @@
   <img src="https://github.com/jrabello/godirzilla/raw/master/assets/godirzilla.png" alt="Godirzilla Logo" width="300"/>
 </div>
 
-Godirzilla is an open-source, powerful, and easy-to-use command-line tool. It allows developers to run predefined sets of commands on multiple repositories, making project management across repositories effortless.
+Godirzilla is a fast, easy-to-use and cognitive cli tool. It allows anyone to run sets of commands on multiple directories, making project management across them  effortless and with rich information about successful or failed operations
 
 ## Features
 
+- Uses AI to auto-organize your groups of directories
+- Extracts maximum information about commands runned as possible.
 - Execute commands concurrently in multiple repositories.
 - User-friendly and intuitive interface.
 - Designed for performance and efficiency.
