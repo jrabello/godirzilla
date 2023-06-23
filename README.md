@@ -15,17 +15,17 @@ Godirzilla is an open-source, powerful, and easy-to-use command-line tool. It al
 
 ## Installation
 
-\```sh
+```sh
 go get github.com/YourUsername/YourRepoName
-\```
+```
 
 ## Usage
 
 Here is a basic example of how to use Godirzilla:
 
-\```sh
+```sh
 gdz run "git status"
-\```
+```
 
 ## Contributing
 
