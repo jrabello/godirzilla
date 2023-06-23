@@ -13,6 +13,14 @@ import (
 	"github.com/jrabello/godirzilla/config"
 )
 
+type CommandResult struct {
+	DirPath    string
+	ExitStatus int
+	isError    bool
+	Stdout     string
+	Stderr     string
+}
+
 func PadRight(str, pad string, length int) string {
 	for {
 		str += pad
@@ -22,9 +30,8 @@ func PadRight(str, pad string, length int) string {
 	}
 }
 
-func runCommand(dirPath config.Directory, command string, threadId int, wg *sync.WaitGroup) {
+func runCommand(dirPath config.Directory, command string, threadId int) CommandResult {
 	log.SetFlags(0)
-	defer wg.Done()
 
 	c := exec.Command("sh", "-c", fmt.Sprintf("cd %s && %s", dirPath, command))
 	var stdoutbuf, stderrbuf bytes.Buffer
@@ -66,19 +73,55 @@ func runCommand(dirPath config.Directory, command string, threadId int, wg *sync
 	if len(errorDescription) > 0 {
 		fmt.Println(errorDescription)
 	}
+
+	return CommandResult{
+		DirPath:    string(dirPath),
+		ExitStatus: exitCode,
+		isError:    (unknownError || exitCode > 0),
+		Stdout:     stdoutbuf.String(),
+		Stderr:     stderrbuf.String(),
+	}
 }
 
 // CreateThreadsAndRunAllCommands runs all commands in their respective group and target directories in separate threads
 func CreateThreadsAndRunAllCommands(command string, currentGroup config.Group, directories []config.Directory) {
 	red := color.New(color.FgRed).SprintFunc()
-	fmt.Printf("🚀 Running command: '%s' in group: '%s'\n\n", red(command), red(currentGroup))
+	fmt.Printf("🚀 Running command: '%s' \n", red(command))
+	fmt.Printf("   Group: '%s' \n\n", red(currentGroup))
 
 	var wg sync.WaitGroup
 	goroutineID := new(int32)
+
+	// Create a buffered channel with capacity equal to number of directories
+	results := make(chan CommandResult, len(directories))
+
 	for _, dir := range directories {
 		wg.Add(1)
-		go runCommand(dir, command, int(atomic.AddInt32(goroutineID, 1)-1), &wg)
+		go func(dir config.Directory, results chan<- CommandResult) {
+			defer wg.Done()
+			results <- runCommand(dir, command, int(atomic.AddInt32(goroutineID, 1)-1))
+		}(dir, results)
 	}
 
+	// Wait for all goroutines to finish
 	wg.Wait()
+
+	// Close the results channel. No more values will be sent on it.
+	close(results)
+
+	successCount := 0
+	failureCount := 0
+
+	// Read from the results channel until it's empty
+	for result := range results {
+		if result.ExitStatus == 0 {
+			successCount++
+		} else {
+			failureCount++
+		}
+	}
+
+	fmt.Println("📊 Summary:")
+	fmt.Printf("Successful Operations: %d\n", successCount)
+	fmt.Printf("Failed Operations: %d\n\n", failureCount)
 }
