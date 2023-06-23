@@ -1,6 +1,6 @@
 # Godirzilla
 
-![Godirzilla Logo](<LOGO_URL>)
+![Godirzilla Logo](https://github.com/jrabello/godirzilla/raw/master/assets/godirzilla.png)
 
 ## Table of Contents
 
