@@ -1,6 +1,6 @@
 # Godirzilla
 <div align="center">
-  <img src="https://github.com/YourUsername/YourRepoName/raw/main/path/to/image.png" alt="Godirzilla Logo" width="300"/>
+  <img src="https://github.com/jrabello/godirzilla/raw/master/assets/godirzilla.png" alt="Godirzilla Logo" width="300"/>
 </div>
 
 Godirzilla is an open-source, powerful, and easy-to-use command-line tool. It allows developers to run predefined sets of commands on multiple repositories, making project management across repositories effortless.
