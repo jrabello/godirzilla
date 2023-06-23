@@ -9,7 +9,7 @@ Godirzilla is a fast, easy-to-use and cognitive cli tool. It allows anyone to ru
 
 - Uses AI to auto-organize your groups of directories
 - Extracts maximum information about commands runned as possible.
-- Execute commands concurrently in multiple repositories.
+- Execute commands in separate threads in multiple repositories.
 - User-friendly and intuitive interface.
 - Designed for performance and efficiency.
 - Easily integrable with any existing development workflow.
