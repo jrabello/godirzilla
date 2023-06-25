@@ -103,10 +103,8 @@ func CreateThreadsAndRunAllCommands(command string, currentGroup config.Group, d
 		}(dir, results)
 	}
 
-	// Wait for all goroutines to finish
+	// Wait for all goroutines to finish and close the results channel
 	wg.Wait()
-
-	// Close the results channel. No more values will be sent on it.
 	close(results)
 
 	// Read from the results channel until it's empty

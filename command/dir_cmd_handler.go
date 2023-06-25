@@ -14,17 +14,48 @@ var DirCmd = &cobra.Command{
 	Short: "Manage directories",
 }
 
-var dirAddCmd = &cobra.Command{
-	Use:   "add [dirName]",
-	Short: "Adds a directory to the current group",
-	Args:  cobra.ExactArgs(1),
+var AIDirAddCmd = &cobra.Command{
+	Use:   "ai:add [dirName0] [dirName1]...",
+	Short: "Adds one or more directories to a group chosen by our AI",
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := config.LoadConfig()
 		if err != nil {
 			log.Fatalf("Error loading config: %v", err)
 		}
 
-		// Check if there is a current group set
+		if cfg.CurrentGroup == "main" {
+			log.Fatal("Group `main` is reserved to run commands only in current directory!!!")
+		}
+
+		// Add each directory to the current group
+		for _, arg := range args {
+			absDir := file.GetAbsoluteFilePath(arg)
+			err = cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
+			if err != nil {
+				log.Fatalf("Error adding directory to group: %v", err)
+			}
+
+			fmt.Printf("Added directory `%s` to current group: `%s`\n", absDir, cfg.CurrentGroup)
+		}
+
+		err = cfg.ApplyChanges()
+		if err != nil {
+			log.Fatalf("Error trying to save config file: %v", err)
+		}
+	},
+}
+
+var dirAddCmd = &cobra.Command{
+	Use:   "add [dirName0] [dirName1]...",
+	Short: "Adds one or more directories to the current group",
+	Args:  cobra.MinimumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := config.LoadConfig()
+		if err != nil {
+			log.Fatalf("Error loading config: %v", err)
+		}
+
 		if cfg.CurrentGroup == "" {
 			log.Fatal("No current group set")
 		}
@@ -33,18 +64,21 @@ var dirAddCmd = &cobra.Command{
 			log.Fatal("Group `main` is reserved to run commands only in current directory!!!")
 		}
 
-		// Add the directory to the current group
-		absDir := file.GetAbsoluteFilePath(args[0])
-		err = cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
-		if err != nil {
-			log.Fatalf("Error adding directory to group: %v", err)
+		// Add each directory to the current group
+		for _, arg := range args {
+			absDir := file.GetAbsoluteFilePath(arg)
+			err = cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
+			if err != nil {
+				log.Fatalf("Error adding directory to group: %v", err)
+			}
+
+			fmt.Printf("Added directory `%s` to current group: `%s`\n", absDir, cfg.CurrentGroup)
 		}
 
 		err = cfg.ApplyChanges()
 		if err != nil {
 			log.Fatalf("Error trying to save config file: %v", err)
 		}
-		fmt.Printf("Added directory `%s` to current group: `%s`\n", absDir, cfg.CurrentGroup)
 	},
 }
 
@@ -78,6 +112,7 @@ var dirRemCmd = &cobra.Command{
 
 func init() {
 	DirCmd.AddCommand(
+		AIDirAddCmd,
 		dirAddCmd,
 		dirListCmd,
 		dirRemCmd,
