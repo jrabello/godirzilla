@@ -95,12 +95,11 @@ var grpListCmd = &cobra.Command{
 			fmt.Println("No group found!")
 		}
 
-		fmt.Println("All Groups:")
 		for groupName := range cfg.Groups {
 			if groupName == cfg.CurrentGroup {
-				fmt.Printf("* %s (current)\n", groupName)
+				fmt.Printf("🔹%s (current)\n", groupName)
 			} else {
-				fmt.Println(groupName)
+				fmt.Printf("🔹%s\n", groupName)
 			}
 
 			dirList, err := cfg.GetDirectoriesFromGroup(groupName)
@@ -109,7 +108,7 @@ var grpListCmd = &cobra.Command{
 			}
 
 			for _, dirName := range dirList {
-				fmt.Printf("\t- %s\n", dirName)
+				fmt.Printf("   📂 %s\n", dirName)
 			}
 		}
 	},

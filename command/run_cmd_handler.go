@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/jrabello/godirzilla/config"
@@ -27,6 +28,15 @@ var RunCmd = &cobra.Command{
 		directoryList, err := cfg.GetDirectoriesFromGroup(cfg.CurrentGroup)
 		if err != nil {
 			log.Fatalf("No DirectoryList was found for group: %s", cfg.CurrentGroup)
+		}
+
+		if cfg.CurrentGroup == "main" {
+			currentDir, err := os.Getwd()
+			if err != nil {
+				log.Fatalf("Unable to get current directory!")
+			}
+
+			directoryList = append(directoryList, config.ToDirectory(currentDir))
 		}
 
 		if len(directoryList) == 0 {

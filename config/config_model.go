@@ -100,7 +100,8 @@ func (c *Config) RemoveDirectoryFromCurrentGroup(dir Directory) error {
 		}
 	}
 
-	if index == -1 {
+	isDirNotExistsInThisGroup := index == -1
+	if isDirNotExistsInThisGroup {
 		return fmt.Errorf("directory %s does not exist in group %s", dir, c.CurrentGroup)
 	}
 

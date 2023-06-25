@@ -109,10 +109,9 @@ func CreateThreadsAndRunAllCommands(command string, currentGroup config.Group, d
 	// Close the results channel. No more values will be sent on it.
 	close(results)
 
+	// Read from the results channel until it's empty
 	successCount := 0
 	failureCount := 0
-
-	// Read from the results channel until it's empty
 	for result := range results {
 		if result.ExitStatus == 0 {
 			successCount++
@@ -121,7 +120,7 @@ func CreateThreadsAndRunAllCommands(command string, currentGroup config.Group, d
 		}
 	}
 
-	fmt.Println("📊 Summary:")
+	fmt.Println("\n📊 Summary:")
 	fmt.Printf("Successful Operations: %d\n", successCount)
 	fmt.Printf("Failed Operations: %d\n\n", failureCount)
 }

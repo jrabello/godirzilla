@@ -29,6 +29,10 @@ var dirAddCmd = &cobra.Command{
 			log.Fatal("No current group set")
 		}
 
+		if cfg.CurrentGroup == "main" {
+			log.Fatal("Group `main` is reserved to run commands only in current directory!!!")
+		}
+
 		// Add the directory to the current group
 		absDir := file.GetAbsoluteFilePath(args[0])
 		err = cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
