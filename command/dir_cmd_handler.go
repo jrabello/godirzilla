@@ -16,7 +16,7 @@ var DirCmd = &cobra.Command{
 
 var AIDirAddCmd = &cobra.Command{
 	Use:   "ai:add [dirName0] [dirName1]...",
-	Short: "Adds one or more directories to a group chosen by our AI",
+	Short: "Adds one or more directories to a group that our AI will create for you",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg, err := config.LoadConfig()
