@@ -11,6 +11,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/jrabello/godirzilla/config"
+	"github.com/jrabello/godirzilla/utils"
 )
 
 type CommandResult struct {
@@ -19,15 +20,6 @@ type CommandResult struct {
 	isError    bool
 	Stdout     string
 	Stderr     string
-}
-
-func PadRight(str, pad string, length int) string {
-	for {
-		str += pad
-		if len(str) > length {
-			return str[0:length]
-		}
-	}
 }
 
 func runCommand(dirPath config.Directory, command string, threadId int) CommandResult {
@@ -58,10 +50,11 @@ func runCommand(dirPath config.Directory, command string, threadId int) CommandR
 		}
 	}
 
+	rightPadding := utils.PadRight(dirBase, ".", 25)
 	if exitCode == 0 {
-		fmt.Printf("📂 %s%s\n", PadRight(dirBase, ".", 25), green("✔️"))
+		fmt.Printf("📂 %s%s\n", rightPadding, green("✔️"))
 	} else {
-		fmt.Printf("📂 %s%s (Exit %d)\n\n", PadRight(dirBase, ".", 25), red("❌"), exitCode)
+		fmt.Printf("📂 %s%s (Exit %d)\n\n", rightPadding, red("❌"), exitCode)
 	}
 
 	if stdoutbuf.Len() > 0 {

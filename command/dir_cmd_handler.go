@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/jrabello/godirzilla/config"
-	"github.com/jrabello/godirzilla/file"
+	"github.com/jrabello/godirzilla/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ var AIDirAddCmd = &cobra.Command{
 
 		// Add each directory to the current group
 		for _, arg := range args {
-			absDir := file.GetAbsoluteFilePath(arg)
+			absDir := utils.GetAbsoluteFilePath(arg)
 			err := cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
 			if err != nil {
 				log.Fatalf("Error adding directory to group: %v", err)
@@ -60,7 +60,7 @@ var dirAddCmd = &cobra.Command{
 
 		// Add each directory to the current group
 		for _, arg := range args {
-			absDir := file.GetAbsoluteFilePath(arg)
+			absDir := utils.GetAbsoluteFilePath(arg)
 			err := cfg.AddDirectoryToGroup(cfg.CurrentGroup, config.ToDirectory(absDir))
 			if err != nil {
 				log.Fatalf("Error adding directory to group: %v", err)

@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jrabello/godirzilla/file"
+	"github.com/jrabello/godirzilla/utils"
 )
 
 var cognusCraft = ".cognuscraft"
@@ -29,7 +29,7 @@ func UpsertNewConfigDirectory() error {
 
 func isConfigFileExists() bool {
 	configFilePath := getConfigFilePath()
-	return file.IsFileExists(configFilePath)
+	return utils.IsFileExists(configFilePath)
 }
 
 func getConfigFilePath() string {

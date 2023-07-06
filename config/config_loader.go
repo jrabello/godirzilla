@@ -20,7 +20,7 @@ func LoadGlobalConfig() error {
 			Groups:       make(map[Group][]Directory),
 		}
 		cfg.Groups["main"] = []Directory{}
-		cfg.version = "1.0.0"
+		cfg.version = "1.0"
 
 		SaveConfig(&cfg)
 		globalConfig = &cfg
