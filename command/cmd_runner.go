@@ -100,6 +100,10 @@ func CreateThreadsAndRunAllCommands(command string, currentGroup config.Group, d
 	wg.Wait()
 	close(results)
 
+	printSummary(results)
+}
+
+func printSummary(results chan CommandResult) {
 	// Read from the results channel until it's empty
 	successCount := 0
 	failureCount := 0
