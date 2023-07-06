@@ -11,19 +11,9 @@ import (
 	"github.com/jrabello/godirzilla/file"
 )
 
-func CreateConfigFileIfNotExists() {
-	if isConfigFileExists() {
-		return
-	}
-
-	cfg := Config{
-		CurrentGroup: "main",
-		Groups:       make(map[Group][]Directory),
-	}
-	cfg.Groups["main"] = []Directory{}
-
-	SaveConfig(&cfg)
-}
+var cognusCraft = ".cognuscraft"
+var godirzilla = "godirzilla"
+var configFileName = "config.json"
 
 func UpsertNewConfigDirectory() error {
 	filePath := getConfigFilePath()
@@ -37,6 +27,21 @@ func UpsertNewConfigDirectory() error {
 	return nil
 }
 
+func isConfigFileExists() bool {
+	configFilePath := getConfigFilePath()
+	return file.IsFileExists(configFilePath)
+}
+
+func getConfigFilePath() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Unable to get user home directory: %v", err)
+	}
+
+	return filepath.Join(homeDir, cognusCraft, godirzilla, configFileName)
+}
+
+// LoadConfig loads the config file into memory
 func LoadConfig() (*Config, error) {
 	configFilePath := getConfigFilePath()
 	data, err := ioutil.ReadFile(configFilePath)
@@ -53,6 +58,7 @@ func LoadConfig() (*Config, error) {
 	return &cfg, nil
 }
 
+// SaveConfig saves config file to disk
 func SaveConfig(config *Config) error {
 	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
@@ -71,18 +77,4 @@ func SaveConfig(config *Config) error {
 	}
 
 	return nil
-}
-
-func isConfigFileExists() bool {
-	configFilePath := getConfigFilePath()
-	return file.IsFileExists(configFilePath)
-}
-
-func getConfigFilePath() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatalf("Unable to get user home directory: %v", err)
-	}
-
-	return filepath.Join(homeDir, ".cognuscraft", "godirzilla", "config.json")
 }

@@ -15,10 +15,7 @@ var RunCmd = &cobra.Command{
 	Short: "Runs a command in all directories in the config file",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Fatalf("Error loading config: %v", err)
-		}
+		cfg := config.GetGlobalConfig()
 
 		if cfg.CurrentGroup == "" {
 			log.Fatal("No current group is set in config, please set a current group before running a command!")

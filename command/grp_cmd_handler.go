@@ -18,10 +18,7 @@ var grpAddCmd = &cobra.Command{
 	Short: "Add a new group",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Fatalf("Error loading config: %v", err)
-		}
+		cfg := config.GetGlobalConfig()
 
 		groupName := config.ToGroup(args[0])
 		if err := cfg.AddGroup(groupName); err != nil {
@@ -38,10 +35,7 @@ var grpRemCmd = &cobra.Command{
 	Short: "Remove a group",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Fatalf("Error loading config: %v", err)
-		}
+		cfg := config.GetGlobalConfig()
 
 		groupName := config.ToGroup(args[0])
 		cfg.RemoveGroup(groupName)
@@ -54,10 +48,7 @@ var grpCurrentCmd = &cobra.Command{
 	Use:   "curr",
 	Short: "Prints current group name",
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Fatalf("Error loading config: %v", err)
-		}
+		cfg := config.GetGlobalConfig()
 		fmt.Printf("Current group: `%s`\n", cfg.CurrentGroup)
 	},
 }
@@ -67,13 +58,10 @@ var grpSetCmd = &cobra.Command{
 	Short: "Set a current group to work with",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Fatalf("Error loading config: %v", err)
-		}
+		cfg := config.GetGlobalConfig()
 
 		groupName := config.Group(args[0])
-		err = cfg.SetCurrentGroup(groupName)
+		err := cfg.SetCurrentGroup(groupName)
 		if err != nil {
 			log.Fatalf("Error setting current group: %v", err)
 		}
@@ -86,10 +74,7 @@ var grpListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all groups and its directories",
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Fatalf("Error loading config: %v", err)
-		}
+		cfg := config.GetGlobalConfig()
 
 		if len(cfg.Groups) == 0 {
 			fmt.Println("No group found!")

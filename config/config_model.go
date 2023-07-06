@@ -9,6 +9,7 @@ type FilePath string
 type Directory string
 
 type Config struct {
+	version      string
 	CurrentGroup Group
 	Groups       map[Group][]Directory
 }
