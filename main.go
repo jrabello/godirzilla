@@ -10,27 +10,41 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "gdz",
-	Short: "GoDirZilla is a cool and fast CLI tool to execute the same command in groups of directories at the same time with a rich output that makes you really understand whats going on",
+type MyApp struct {
+	RootCmd *cobra.Command
+	Config  *config.Config
 }
 
-func execRootCmd() {
-	if err := rootCmd.Execute(); err != nil {
+func (app *MyApp) ExecRootCmd() {
+	if err := app.RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func main() {
-	err := config.LoadGlobalConfig()
-	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
+func initializeApplication(cfg *config.Config) *MyApp {
+	app := &MyApp{
+		Config: cfg,
+		RootCmd: &cobra.Command{
+			Use:   "gdz",
+			Short: "GoDirZilla is a fast, cool and cognitive CLI tool to execute commands in groups of directories at the same time with a rich output that makes you really understand what's going on in your terminal",
+		},
 	}
 
-	rootCmd.AddCommand(command.DirCmd)
-	rootCmd.AddCommand(command.GrpCmd)
-	rootCmd.AddCommand(command.RunCmd)
+	app.RootCmd.AddCommand(command.GetDirCmd(app.Config))
+	app.RootCmd.AddCommand(command.GrpCmd(app.Config))
+	app.RootCmd.AddCommand(command.RunCmd(app.Config))
+	app.RootCmd.AddCommand(command.AICmd(app.Config))
 
-	execRootCmd()
+	return app
+}
+
+func main() {
+	config, err := config.LoadGlobalConfig()
+	if err != nil {
+		log.Fatalf("Error loading config file: %v", err)
+	}
+
+	app := initializeApplication(config)
+	app.ExecRootCmd()
 }

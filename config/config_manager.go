@@ -11,8 +11,8 @@ import (
 	"github.com/jrabello/godirzilla/utils"
 )
 
-var cognusCraft = ".cognuscraft"
-var godirzilla = "godirzilla"
+var cognusCraftPath = ".cognuscraft"
+var godirzillaPath = "godirzilla"
 var configFileName = "config.json"
 
 func UpsertNewConfigDirectory() error {
@@ -38,7 +38,7 @@ func getConfigFilePath() string {
 		log.Fatalf("Unable to get user home directory: %v", err)
 	}
 
-	return filepath.Join(homeDir, cognusCraft, godirzilla, configFileName)
+	return filepath.Join(homeDir, cognusCraftPath, godirzillaPath, configFileName)
 }
 
 // LoadConfig loads the config file into memory
